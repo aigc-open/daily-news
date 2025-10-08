@@ -48,7 +48,7 @@ class PosterGenerator:
         """
         # 设置默认背景图片
         if bg_image is None:
-            bg_image = "daily_news_poster/background/white_tech.png"
+            bg_image = "daily_news_poster/background/template.png"
         
         # 更新颜色配置
         if title_color:
@@ -102,43 +102,61 @@ class PosterGenerator:
         poster = background.copy()
         draw = ImageDraw.Draw(poster)
         
-        # 尝试加载中文字体，优先使用支持中文的字体
+        # 尝试加载中文字体，优先使用内置字体
         try:
-            # 优先尝试PingFang字体（支持中文）
-            title_font = ImageFont.truetype("/System/Library/Fonts/PingFang.ttc", self.title_font_size)
-            section_font = ImageFont.truetype("/System/Library/Fonts/PingFang.ttc", self.section_font_size)
-            text_font = ImageFont.truetype("/System/Library/Fonts/PingFang.ttc", self.default_font_size)
+            # 优先使用内置的文泉驿微米黑字体（跨平台支持中文）
+            font_path = os.path.join(os.path.dirname(__file__), 'fonts', 'wqy-microhei.ttc')
+            title_font = ImageFont.truetype(font_path, self.title_font_size)
+            section_font = ImageFont.truetype(font_path, self.section_font_size)
+            text_font = ImageFont.truetype(font_path, self.default_font_size)
+            print("使用内置字体: 文泉驿微米黑")
 
         except:
             try:
-                # 尝试Hiragino Sans GB（支持中文）
-                title_font = ImageFont.truetype("/System/Library/Fonts/Hiragino Sans GB.ttc", self.title_font_size)
-                section_font = ImageFont.truetype("/System/Library/Fonts/Hiragino Sans GB.ttc", self.section_font_size)
-                text_font = ImageFont.truetype("/System/Library/Fonts/Hiragino Sans GB.ttc", self.default_font_size)
+                # 尝试PingFang字体（macOS，支持中文）
+                title_font = ImageFont.truetype("/System/Library/Fonts/PingFang.ttc", self.title_font_size)
+                section_font = ImageFont.truetype("/System/Library/Fonts/PingFang.ttc", self.section_font_size)
+                text_font = ImageFont.truetype("/System/Library/Fonts/PingFang.ttc", self.default_font_size)
+                print("使用系统字体: PingFang")
+
             except:
                 try:
-                    # 尝试STHeiti Light（华文黑体，支持中文）
-                    title_font = ImageFont.truetype("/System/Library/Fonts/STHeiti Light.ttc", self.title_font_size)
-                    section_font = ImageFont.truetype("/System/Library/Fonts/STHeiti Light.ttc", self.section_font_size)
-                    text_font = ImageFont.truetype("/System/Library/Fonts/STHeiti Light.ttc", self.default_font_size)
+                    # 尝试Hiragino Sans GB（macOS，支持中文）
+                    title_font = ImageFont.truetype("/System/Library/Fonts/Hiragino Sans GB.ttc", self.title_font_size)
+                    section_font = ImageFont.truetype("/System/Library/Fonts/Hiragino Sans GB.ttc", self.section_font_size)
+                    text_font = ImageFont.truetype("/System/Library/Fonts/Hiragino Sans GB.ttc", self.default_font_size)
+                    print("使用系统字体: Hiragino Sans GB")
+
                 except:
                     try:
-                        # 尝试STHeiti Medium（华文黑体，支持中文）
-                        title_font = ImageFont.truetype("/System/Library/Fonts/STHeiti Medium.ttc", self.title_font_size)
-                        section_font = ImageFont.truetype("/System/Library/Fonts/STHeiti Medium.ttc", self.section_font_size)
-                        text_font = ImageFont.truetype("/System/Library/Fonts/STHeiti Medium.ttc", self.default_font_size)
+                        # 尝试STHeiti Light（华文黑体，支持中文）
+                        title_font = ImageFont.truetype("/System/Library/Fonts/STHeiti Light.ttc", self.title_font_size)
+                        section_font = ImageFont.truetype("/System/Library/Fonts/STHeiti Light.ttc", self.section_font_size)
+                        text_font = ImageFont.truetype("/System/Library/Fonts/STHeiti Light.ttc", self.default_font_size)
+                        print("使用系统字体: STHeiti Light")
+
                     except:
                         try:
-                            # 最后尝试Arial Unicode MS（支持中文）
-                            title_font = ImageFont.truetype("/System/Library/Fonts/Supplemental/Arial Unicode.ttf", self.title_font_size)
-                            section_font = ImageFont.truetype("/System/Library/Fonts/Supplemental/Arial Unicode.ttf", self.section_font_size)
-                            text_font = ImageFont.truetype("/System/Library/Fonts/Supplemental/Arial Unicode.ttf", self.default_font_size)
+                            # 尝试STHeiti Medium（华文黑体，支持中文）
+                            title_font = ImageFont.truetype("/System/Library/Fonts/STHeiti Medium.ttc", self.title_font_size)
+                            section_font = ImageFont.truetype("/System/Library/Fonts/STHeiti Medium.ttc", self.section_font_size)
+                            text_font = ImageFont.truetype("/System/Library/Fonts/STHeiti Medium.ttc", self.default_font_size)
+                            print("使用系统字体: STHeiti Medium")
+
                         except:
-                            # 如果所有字体都加载失败，使用默认字体
-                            print("警告: 无法加载中文字体，可能显示乱码")
-                            title_font = ImageFont.load_default()
-                            section_font = ImageFont.load_default()
-                            text_font = ImageFont.load_default()
+                            try:
+                                # 尝试Arial Unicode MS（支持中文）
+                                title_font = ImageFont.truetype("/System/Library/Fonts/Supplemental/Arial Unicode.ttf", self.title_font_size)
+                                section_font = ImageFont.truetype("/System/Library/Fonts/Supplemental/Arial Unicode.ttf", self.section_font_size)
+                                text_font = ImageFont.truetype("/System/Library/Fonts/Supplemental/Arial Unicode.ttf", self.default_font_size)
+                                print("使用系统字体: Arial Unicode MS")
+
+                            except:
+                                # 如果所有字体都加载失败，使用默认字体
+                                print("警告: 无法加载中文字体，使用默认字体，可能显示乱码")
+                                title_font = ImageFont.load_default()
+                                section_font = ImageFont.load_default()
+                                text_font = ImageFont.load_default()
         
         # 获取图片尺寸
         width, height = poster.size
